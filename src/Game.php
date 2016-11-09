@@ -21,6 +21,11 @@ class Game
     private $hand;
 
     /**
+     * @var Card
+     */
+    private $bank;
+
+    /**
      * @var Socket
      */
     private $client;
@@ -35,8 +40,6 @@ class Game
 
     public function receive(string $message)
     {
-        echo "Got message {$message}".PHP_EOL;
-
         if ('ROUND STARTING' === $message) {
             echo 'A new game starts'.PHP_EOL;
             $this->hand = new Hand();
@@ -47,6 +50,10 @@ class Game
         } elseif (0 === strpos($message, 'CARD')) {
             list($a, $card) = explode(';', $message);
             $this->addCard((int) $card);
+
+        } elseif (0 === strpos($message, 'BANK')) {
+            list($a, $card) = explode(';', $message);
+            $this->bank = new Card((int) $card);
 
         } elseif ('STAY_OR_CARD' === $message) {
             $this->stayOrCard();
@@ -86,7 +93,7 @@ class Game
 
     private function stayOrCard()
     {
-        if ($this->hand->getValue() > 16) {
+        if ($this->hand->stayOrCard($this->bank)) {
             echo '; staying with it'.PHP_EOL;
             $this->client->send('STAY;'.self::PLAYER);
         } else {
@@ -100,6 +107,6 @@ class Game
         $win = $money - $this->chips;
         $this->chips = $money;
 
-        echo "Round ended; won ${win}; money stack is now at {$this->chips}".PHP_EOL;
+        echo "Round ended; won ${win}; money stack is now at {$this->chips}".PHP_EOL.PHP_EOL;
     }
 }
