@@ -74,7 +74,7 @@ class Game
         if ($this->chips <= 10) {
             $money = $this->chips;
         } else {
-            $money = (int) $this->chips / 10;
+            $money = (int) ($this->chips / 10);
             $money = $money < 10 ? 10 : $money;
         }
 
