@@ -2,6 +2,8 @@
 
 declare(strict_types = 1);
 
+use CodingGame\BlackJack\Game;
+
 require_once __DIR__.'/vendor/autoload.php';
 
 $loop = React\EventLoop\Factory::create();
@@ -9,17 +11,22 @@ $factory = new React\Datagram\Factory($loop);
 
 $factory->createClient('192.168.1.14:22040')
     ->then(function (React\Datagram\Socket $client) {
-        $client->send('JOIN;Patrik');
+        $client->send('JOIN;'.Game::PLAYER);
 
-        $client->on('message', function ($message, $serverAddress, $client) {
+        $client->once('message', function ($message, $serverAddress, $client) {
             switch ($message) {
                 case 'OK':
                     echo 'Registered successfully at the game'.PHP_EOL;
+                    new Game($client);
+
                     break;
 
-                default:
-                    echo "Got ${message} from server";
+                case 'REJECTED':
+                    echo 'Server rejected us'.PHP_EOL;
                     exit;
+
+                default:
+                    echo "Got ${message} from server".PHP_EOL;
             }
         });
 
