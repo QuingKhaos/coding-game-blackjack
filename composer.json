@@ -1,5 +1,6 @@
 {
     "name": "patkar/black-jack",
+    "type": "project",
     "description": "Coding Game: Black Jack",
     "license": "MIT",
     "authors": [
